@@ -52,9 +52,7 @@ class ApiController extends AbstractController
             $data = json_decode($request->getContent(), true);
             if(isset($data['token']) || array_key_exists('token', $data)) {
                 $phone = new Phone();
-                $phone
-                    ->setToken($data['token'])
-                    ->setUsername($data['username'] ?? 'Genesis');
+                $phone->setToken($data['token']);
 
                 try{
                     $em->persist($phone);
