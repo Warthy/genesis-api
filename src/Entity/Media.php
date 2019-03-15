@@ -3,12 +3,15 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MediaRepository")
+ * @HasLifecycleCallbacks
  */
 class Media
 {
+    const ASSETS_PATH = '../public/assets/';
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -19,26 +22,35 @@ class Media
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $url;
+    private $path;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Post", inversedBy="Media")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Post", inversedBy="medias")
      */
     private $post;
+
+    /**
+     * @ORM\PreRemove()
+     */
+    public function removeFile(){
+        if(file_exists(self::ASSETS_PATH.$this->path)){
+            unlink(self::ASSETS_PATH.$this->path);
+        }
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUrl(): ?string
+    public function getPath(): ?string
     {
-        return $this->url;
+        return $this->path;
     }
 
-    public function setUrl(string $url): self
+    public function setPath(string $path): self
     {
-        $this->url = $url;
+        $this->path = $path;
 
         return $this;
     }

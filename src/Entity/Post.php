@@ -2,16 +2,20 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\Date;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
+ * @HasLifecycleCallbacks
  */
 class Post
 {
+    const MEDIA_ROOT_DIR = 'posts/';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -35,14 +39,42 @@ class Post
     private $content;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Media", mappedBy="post")
+     * @ORM\OneToMany(targetEntity="App\Entity\Media", mappedBy="post", cascade={"persist"}, orphanRemoval=true)
      */
-    private $media;
+    private $medias;
+
+    /**
+     * @var ArrayCollection
+     */
+    public $uploadedFiles;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @var \DateTime
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\PreFlush()
+     */
+    public function upload(){
+        $this->updatedAt = new \DateTime('now');
+        foreach ($this->uploadedFiles as $uploadedFile){
+            $media = new Media();
+
+            $path = sha1(uniqid(mt_rand(), true)).'.'.$uploadedFile->guessExtension();
+            $uploadedFile->move(Media::ASSETS_PATH.self::MEDIA_ROOT_DIR, $path);
+
+            $media->setPath(self::MEDIA_ROOT_DIR.$path);
+            $this->addMedia($media);
+            unset($uploadedFile);
+        }
+    }
 
     public function __construct()
     {
-        $this->media = new ArrayCollection();
-        $this->publicationDate = new Date();
+        $this->medias = new ArrayCollection();
+        $this->publicationDate = new DateTime('now');
     }
 
     public function getId(): ?int
@@ -89,15 +121,15 @@ class Post
     /**
      * @return Collection|Media[]
      */
-    public function getMedia(): Collection
+    public function getMedias(): Collection
     {
-        return $this->media;
+        return $this->medias;
     }
 
     public function addMedia(Media $media): self
     {
-        if (!$this->media->contains($media)) {
-            $this->media[] = $media;
+        if (!$this->medias->contains($media)) {
+            $this->medias[] = $media;
             $media->setPost($this);
         }
 
@@ -106,8 +138,8 @@ class Post
 
     public function removeMedia(Media $media): self
     {
-        if ($this->media->contains($media)) {
-            $this->media->removeElement($media);
+        if ($this->medias->contains($media)) {
+            $this->medias->removeElement($media);
             // set the owning side to null (unless already changed)
             if ($media->getPost() === $this) {
                 $media->setPost(null);

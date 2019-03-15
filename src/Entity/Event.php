@@ -4,15 +4,17 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EventRepository")
- * @Vich\Uploadable
+ * @HasLifecycleCallbacks
  */
 class Event
 {
+    const MEDIA_ROOT_DIR = 'events/';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -51,21 +53,44 @@ class Event
     private $endsAt;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @var Media
+     * @ORM\OneToOne(targetEntity="App\Entity\Media", cascade={"persist", "remove"})
      */
     private $media;
 
     /**
-     * @Vich\UploadableField(mapping="event_medias", fileNameProperty="media")
-     * @var File
+     * @var UploadedFile
      */
-    private $mediaFile;
+    public $uploadedFile;
 
     /**
      * @ORM\Column(type="datetime")
      * @var \DateTime
      */
     private $updatedAt;
+
+    /**
+     * @ORM\PreFlush()
+     */
+    public function upload(){
+        $this->updatedAt = new \DateTime('now');
+        $media = new Media();
+
+        $path = sha1(uniqid(mt_rand(), true)).'.'.$this->uploadedFile->guessExtension();
+        $this->uploadedFile->move(Media::ASSETS_PATH.self::MEDIA_ROOT_DIR, $path);
+
+        $media->setPath(self::MEDIA_ROOT_DIR.$path);
+        $this->setMedia($media);
+
+        unset($uploadedFile);
+    }
+
+    /**
+     * @ORM\PreRemove()
+     */
+    public function removeFile(){
+        if($this->media) $this->media->removeFile();
+    }
 
     public function getId(): ?int
     {
@@ -144,29 +169,16 @@ class Event
         return $this;
     }
 
-
-    public function setMediaFile(File $media = null)
-    {
-        $this->mediaFile = $media;
-        if ($media) {
-            $this->updatedAt = new DateTime('now');
-        }
-    }
-
-    public function getMediaFile()
-    {
-        return $this->mediaFile;
-    }
-
-    public function setMedia(string $media): self
-    {
-        $this->media = $media;
-        return $this;
-    }
-
-    public function getMedia(): ?string
+    public function getMedia(): ?Media
     {
         return $this->media;
+    }
+
+    public function setMedia(?Media $media): self
+    {
+        $this->media = $media;
+
+        return $this;
     }
     
 }

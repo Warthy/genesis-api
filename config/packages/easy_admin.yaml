@@ -22,9 +22,11 @@ easy_admin:
             form:
                 fields:
                     - 'title'
-                    - { property: 'content', type: 'textarea' }
+                    - { property: 'content', label: 'Contenue',type: 'textarea' }
+                    - { property: 'uploadedFiles', label: 'Images', type: 'file', type_options: { multiple: 'true' } }
         Event:
             class: App\Entity\Event
+            image_base_path: '/assets'
             list:
                 fields:
                     - 'title'
@@ -33,7 +35,7 @@ easy_admin:
                     - { property: 'date', type: 'date' }
                     - { property: 'startsAt', label: 'Début', type: 'time' }
                     - { property: 'EndsAt', label: 'Fin', type: 'time' }
-                    - { property: 'media', type: 'image', base_path: '%app.path.event_medias%' }
+                    - { property: 'media.path', label: 'Image', type: 'image' }
                 sort: ['date', 'ASC']
             search:
                 sort: ['date', 'ASC']
@@ -44,7 +46,7 @@ easy_admin:
                     - 'Date'
                     - 'StartsAt'
                     - 'EndsAt'
-                    - { property: 'media', type: 'image', base_path: '%app.path.event_medias%' }
+                    - { property: 'media.path', type: 'image' }
             form:
                 fields:
                     - 'title'
@@ -53,6 +55,6 @@ easy_admin:
                     - { property: 'date', type: 'date', type_options: { widget: 'choice', format: 'dd/MM/yyyy' } }
                     - { property: 'startsAt', type_options: { widget: 'choice' } }
                     - { property: 'endsAt', type_options: { widget: 'choice' } }
-                    - { property: 'mediaFile', type: 'vich_image' }
+                    - { property: 'uploadedFile', type: 'file' }
 
 
