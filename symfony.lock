@@ -1,4 +1,7 @@
 {
+    "alymosul/exponent-server-sdk-php": {
+        "version": "v1.1.2"
+    },
     "behat/transliterator": {
         "version": "v1.2.0"
     },
