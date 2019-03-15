@@ -1,0 +1,37 @@
+easy_admin:
+    entities:
+        Event:
+            class: App\Entity\Event
+            image_base_path: '/assets'
+            menu:
+                label: 'Evenements'
+                icon: 'calendar-minus'
+            list:
+                fields:
+                    - { property: 'title', label: 'Titre' }
+                    - { property: 'description', label: 'Description' }
+                    - { property: 'location', label: 'Lieu' }
+                    - { property: 'date', type: 'date' }
+                    - { property: 'startsAt', label: 'Début', type: 'time' }
+                    - { property: 'EndsAt', label: 'Fin', type: 'time' }
+                    - { property: 'media.path', label: 'Image', type: 'image' }
+                sort: ['date', 'ASC']
+            search:
+                sort: ['date', 'ASC']
+            show:
+                fields:
+                    - 'title'
+                    - 'location'
+                    - 'Date'
+                    - 'StartsAt'
+                    - 'EndsAt'
+                    - { property: 'media.path', type: 'image' }
+            form:
+                fields:
+                    - 'title'
+                    - { property: 'description', type: 'textarea' }
+                    - { property: 'location', label: 'Lieu', type: 'text' }
+                    - { property: 'date', type: 'date', type_options: { widget: 'choice', format: 'dd/MM/yyyy' } }
+                    - { property: 'startsAt', label: 'Début (heure)', type_options: { widget: 'choice' } }
+                    - { property: 'endsAt', label: 'Fin (heure)', type_options: { widget: 'choice' } }
+                    - { property: 'uploadedFile', label: 'Images', type: 'file' }

@@ -1,0 +1,20 @@
+easy_admin:
+    entities:
+        Post:
+            class: App\Entity\Post
+            menu:
+                label: 'Posts'
+                icon: 'newspaper-o'
+            list:
+                fields:
+                    - { property: 'title', label: 'Titre' }
+                    - { property: 'content', label: 'Contenu' }
+                    - { property: 'publicationDate', label: 'Date de publication', type: 'date' }
+                sort: 'publicationDate'
+            search:
+                sort: 'publicationDate'
+            form:
+                fields:
+                    - { property: 'title', label: 'Titre', type: 'text'}
+                    - { property: 'content', label: 'Contenu',type: 'textarea' }
+                    - { property: 'uploadedFiles', label: 'Images', type: 'file', type_options: { multiple: 'true' } }

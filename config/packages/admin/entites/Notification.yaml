@@ -1,0 +1,16 @@
+easy_admin:
+    entities:
+        Notification:
+            class: App\Entity\Notification
+            list:
+                fields:
+                    - { property: 'sendAt', label: "Date d'envoie", type: 'date' }
+                    - { property: 'title', label: 'Titre' }
+                    - 'body'
+                    - { property: 'random', label: 'Notification aléatoire', type: 'boolean'}
+            form:
+                fields:
+                    - 'title'
+                    - { property: 'body', type: 'text'}
+                    - { property: 'subtitle', label: 'Substitle (IOS Only)' ,type: 'string'}
+                    - { property: 'priority', type: 'select', type_options: { choices: ['default','normal','high'] } }
