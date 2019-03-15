@@ -63,7 +63,7 @@ class NotificationSubscriber implements EventSubscriberInterface
         try {
             $expo->notify($ids, $notification);
         } catch (ExpoException $e) {
-            
+
         }
     }
 }
