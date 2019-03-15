@@ -34,4 +34,4 @@ easy_admin:
                     - { property: 'date', type: 'date', type_options: { widget: 'choice', format: 'dd/MM/yyyy' } }
                     - { property: 'startsAt', label: 'Début (heure)', type_options: { widget: 'choice' } }
                     - { property: 'endsAt', label: 'Fin (heure)', type_options: { widget: 'choice' } }
-                    - { property: 'uploadedFile', label: 'Images', type: 'file' }
+                    - { property: 'uploadedFile', label: 'Image', type: 'file' }

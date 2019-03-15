@@ -2,6 +2,7 @@ easy_admin:
     entities:
         Notification:
             class: App\Entity\Notification
+            disabled_actions: ['edit', 'delete']
             list:
                 fields:
                     - { property: 'sendAt', label: "Date d'envoie", type: 'date' }
@@ -10,7 +11,8 @@ easy_admin:
                     - { property: 'random', label: 'Notification aléatoire', type: 'boolean'}
             form:
                 fields:
-                    - 'title'
+                    - { property: 'title', label: 'Titre', type: 'text'}
                     - { property: 'body', type: 'text'}
-                    - { property: 'subtitle', label: 'Substitle (IOS Only)' ,type: 'string'}
-                    - { property: 'priority', type: 'select', type_options: { choices: ['default','normal','high'] } }
+                    - { property: 'subtitle', label: 'Substitle (IOS Only)' ,type: 'text'}
+                    - { property: 'priority', label: 'Priorité', type: 'choice', type_options: { choices: {default: 'default',normal: 'normal',high: 'high'} } }
+                    - { property: 'random', label: 'Aléatoire (Envoyer une seule notification de manière aléatoire)', type: 'checkbox'}

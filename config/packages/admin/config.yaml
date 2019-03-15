@@ -2,7 +2,7 @@ easy_admin:
     site_name: 'Genesis | Administration'
     design:
         menu:
-            - { entity: 'Post', label: 'Posts', icon: 'newspaper-o'}
+            - { entity: 'Post', label: 'Publications', icon: 'newspaper-o'}
             - { entity: 'Event', label: 'Evenements', icon: 'calendar'}
             - { entity: 'Notification', label: 'Notifications', icon: 'bell'}
         assets:
