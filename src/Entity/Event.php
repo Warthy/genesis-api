@@ -2,10 +2,14 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EventRepository")
+ * @Vich\Uploadable
  */
 class Event
 {
@@ -47,9 +51,21 @@ class Event
     private $endsAt;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Media", cascade={"persist", "remove"})
+     * @ORM\Column(type="string", length=255)
      */
-    private $background;
+    private $media;
+
+    /**
+     * @Vich\UploadableField(mapping="event_medias", fileNameProperty="media")
+     * @var File
+     */
+    private $mediaFile;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @var \DateTime
+     */
+    private $updatedAt;
 
     public function getId(): ?int
     {
@@ -121,23 +137,36 @@ class Event
         return $this->endsAt;
     }
 
-    public function setEndTime(?\DateTimeInterface $endsAt): self
+    public function setEndsAt(?\DateTimeInterface $endsAt): self
     {
         $this->endsAt = $endsAt;
 
         return $this;
     }
 
-    public function getBackground(): ?Media
+
+    public function setMediaFile(File $media = null)
     {
-        return $this->background;
+        $this->mediaFile = $media;
+        if ($media) {
+            $this->updatedAt = new DateTime('now');
+        }
     }
 
-    public function setBackground(?Media $background): self
+    public function getMediaFile()
     {
-        $this->background = $background;
+        return $this->mediaFile;
+    }
 
+    public function setMedia(string $media): self
+    {
+        $this->media = $media;
         return $this;
+    }
+
+    public function getMedia(): ?string
+    {
+        return $this->media;
     }
     
 }

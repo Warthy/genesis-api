@@ -3,10 +3,19 @@ easy_admin:
     design:
         assets:
             favicon: '/assets/favicon.png'
+    formats:
+        date:     'd/m/Y'
+        time:     'H:i'
+        datetime: 'd/m/Y H:i:s'
+
     entities:
         Post:
             class: App\Entity\Post
             list:
+                fields:
+                    - 'title'
+                    - 'content'
+                    - { property: 'publicationDate', label: 'Date de publication', type: 'date' }
                 sort: 'publicationDate'
             search:
                 sort: 'publicationDate'
@@ -17,16 +26,33 @@ easy_admin:
         Event:
             class: App\Entity\Event
             list:
+                fields:
+                    - 'title'
+                    - 'description'
+                    - 'location'
+                    - { property: 'date', type: 'date' }
+                    - { property: 'startsAt', label: 'Début', type: 'time' }
+                    - { property: 'EndsAt', label: 'Fin', type: 'time' }
+                    - { property: 'media', type: 'image', base_path: '%app.path.event_medias%' }
                 sort: ['date', 'ASC']
             search:
                 sort: ['date', 'ASC']
+            show:
+                fields:
+                    - 'title'
+                    - 'location'
+                    - 'Date'
+                    - 'StartsAt'
+                    - 'EndsAt'
+                    - { property: 'media', type: 'image', base_path: '%app.path.event_medias%' }
             form:
                 fields:
                     - 'title'
-                    - { property: 'content', type: 'textarea' }
+                    - { property: 'description', type: 'textarea' }
                     - 'location'
-                    - { property: 'date', type_options: { widget: 'single_text', format: 'MM-dd-MM-yyyy' } }
+                    - { property: 'date', type: 'date', type_options: { widget: 'choice', format: 'dd/MM/yyyy' } }
                     - { property: 'startsAt', type_options: { widget: 'choice' } }
                     - { property: 'endsAt', type_options: { widget: 'choice' } }
+                    - { property: 'mediaFile', type: 'vich_image' }
 
 
