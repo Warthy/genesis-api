@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -45,6 +46,16 @@ class Notification
      * @ORM\Column(type="json_array", nullable=true)
      */
     private $response;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $sendAt;
+
+    public function __construct()
+    {
+        $this->sendAt = new DateTime('now');
+    }
 
     public function getId(): ?int
     {
@@ -119,6 +130,18 @@ class Notification
     public function setResponse($response): self
     {
         $this->response = $response;
+
+        return $this;
+    }
+
+    public function getSendAt(): ?\DateTimeInterface
+    {
+        return $this->sendAt;
+    }
+
+    public function setSendAt(\DateTimeInterface $sendAt): self
+    {
+        $this->sendAt = $sendAt;
 
         return $this;
     }
