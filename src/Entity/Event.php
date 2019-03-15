@@ -24,7 +24,7 @@ class Event
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $text;
+    private $description;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -68,14 +68,14 @@ class Event
         return $this;
     }
 
-    public function getText(): ?string
+    public function getDescription(): ?string
     {
-        return $this->text;
+        return $this->description;
     }
 
-    public function setText(?string $text): self
+    public function setDescription(?string $description): self
     {
-        $this->text = $text;
+        $this->description = $description;
 
         return $this;
     }
