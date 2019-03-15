@@ -39,12 +39,12 @@ class Event
     /**
      * @ORM\Column(type="time")
      */
-    private $startTime;
+    private $startsAt;
 
     /**
      * @ORM\Column(type="time", nullable=true)
      */
-    private $endTime;
+    private $endsAt;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Media", cascade={"persist", "remove"})
@@ -104,26 +104,26 @@ class Event
         return $this;
     }
 
-    public function getStartTime(): ?\DateTimeInterface
+    public function getStartsAt(): ?\DateTimeInterface
     {
-        return $this->startTime;
+        return $this->startsAt;
     }
 
-    public function setStartTime(\DateTimeInterface $startTime): self
+    public function setStartsAt(\DateTimeInterface $startsAt): self
     {
-        $this->startTime = $startTime;
+        $this->startsAt = $startsAt;
 
         return $this;
     }
 
-    public function getEndTime(): ?\DateTimeInterface
+    public function getEndsAt(): ?\DateTimeInterface
     {
-        return $this->endTime;
+        return $this->endsAt;
     }
 
-    public function setEndTime(?\DateTimeInterface $endTime): self
+    public function setEndTime(?\DateTimeInterface $endsAt): self
     {
-        $this->endTime = $endTime;
+        $this->endsAt = $endsAt;
 
         return $this;
     }

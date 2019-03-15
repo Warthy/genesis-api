@@ -36,11 +36,11 @@ class Post
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Media", mappedBy="post")
      */
-    private $Media;
+    private $media;
 
     public function __construct()
     {
-        $this->Media = new ArrayCollection();
+        $this->media = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -89,26 +89,26 @@ class Post
      */
     public function getMedia(): Collection
     {
-        return $this->Media;
+        return $this->media;
     }
 
-    public function addMedium(Media $medium): self
+    public function addMedia(Media $media): self
     {
-        if (!$this->Media->contains($medium)) {
-            $this->Media[] = $medium;
-            $medium->setPost($this);
+        if (!$this->media->contains($media)) {
+            $this->media[] = $media;
+            $media->setPost($this);
         }
 
         return $this;
     }
 
-    public function removeMedium(Media $medium): self
+    public function removeMedia(Media $media): self
     {
-        if ($this->Media->contains($medium)) {
-            $this->Media->removeElement($medium);
+        if ($this->media->contains($media)) {
+            $this->media->removeElement($media);
             // set the owning side to null (unless already changed)
-            if ($medium->getPost() === $this) {
-                $medium->setPost(null);
+            if ($media->getPost() === $this) {
+                $media->setPost(null);
             }
         }
 
