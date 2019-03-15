@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Notification;
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use ExponentPhpSDK\Exceptions\ExpoException;
 use ExponentPhpSDK\Expo;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
@@ -37,11 +38,18 @@ class NotificationSubscriber implements EventSubscriberInterface
             return;
         }
         $expo = Expo::normalSetup();
-        
+
         $notification = $entity;
 
-        $target = $this->phoneRepository->findAll();
-        if($notification->getRandom()) $target = [array_rand($target)];
+        $targets = $this->phoneRepository->findAll();
+        $ids = [];
+
+        if($notification->getRandom()) $targets = [array_rand($targets)];
+        foreach ($targets as $target)
+        {
+            $expo->subscribe($target->getToken(), $target->getToken());
+            $ids[] = $target->getId();
+        }
 
         $notificationRequest = [
             'title' => $notification->getTitle(),
@@ -50,8 +58,12 @@ class NotificationSubscriber implements EventSubscriberInterface
             'ttl' => 10,
             'priority' => $notification->getPriority() ?? 'default',
             'sound' => 'default',
-
         ];
 
+        try {
+            $expo->notify($ids, $notification);
+        } catch (ExpoException $e) {
+            
+        }
     }
 }
