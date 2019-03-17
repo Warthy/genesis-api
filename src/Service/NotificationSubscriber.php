@@ -61,7 +61,8 @@ class NotificationSubscriber implements EventSubscriberInterface
         ];
 
         try {
-            $expo->notify($ids, $notification);
+            $response = $expo->notify($ids, $notification);
+            $notification->setResponse($response);
         } catch (ExpoException $e) {
 
         }
