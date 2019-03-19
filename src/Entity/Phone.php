@@ -17,7 +17,7 @@ class Phone
     private $id;
 
     /**
-     * @ORM\Column(type="string", unique=true, length=255)
+     * @ORM\Column(type="string", unique=true, length=200)
      */
     private $token;
 

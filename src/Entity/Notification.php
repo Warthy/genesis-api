@@ -43,7 +43,7 @@ class Notification
     private $random = false;
 
     /**
-     * @ORM\Column(type="json_array", nullable=true)
+     * @ORM\Column(type="array", nullable=true)
      */
     private $response;
 
