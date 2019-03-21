@@ -169,9 +169,9 @@ class Event
         return $this;
     }
 
-    public function getMedia(): ?Media
+    public function getMedia(): ?string
     {
-        return $this->media;
+        return $this->media->getPath();
     }
 
     public function setMedia(?Media $media): self

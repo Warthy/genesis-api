@@ -1,3 +1,6 @@
+app_login:
+    path:  /
+    controller: App\Controller\SecurityController::login
 app_logout:
     path: /logout
     methods: GET

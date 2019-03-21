@@ -57,15 +57,16 @@ class Post
     /**
      * @ORM\PreFlush()
      */
-    public function upload(){
+    public function upload()
+    {
         $this->updatedAt = new \DateTime('now');
-        foreach ($this->uploadedFiles as $uploadedFile){
+        foreach ($this->uploadedFiles as $uploadedFile) {
             $media = new Media();
 
-            $path = sha1(uniqid(mt_rand(), true)).'.'.$uploadedFile->guessExtension();
-            $uploadedFile->move(Media::ASSETS_PATH.self::MEDIA_ROOT_DIR, $path);
+            $path = sha1(uniqid(mt_rand(), true)) . '.' . $uploadedFile->guessExtension();
+            $uploadedFile->move(Media::ASSETS_PATH . self::MEDIA_ROOT_DIR, $path);
 
-            $media->setPath(self::MEDIA_ROOT_DIR.$path);
+            $media->setPath(self::MEDIA_ROOT_DIR . $path);
             $this->addMedia($media);
             unset($uploadedFile);
         }
@@ -121,9 +122,11 @@ class Post
     /**
      * @return Collection|Media[]
      */
-    public function getMedias(): Collection
+    public function getMedias()
     {
-        return $this->medias;
+        return $this->medias->map(function ($element) {
+            return $element->getPath();
+        });
     }
 
     public function addMedia(Media $media): self

@@ -22,25 +22,39 @@ class ApiController extends AbstractController
     /**
      * @Route("/event", name="api_event", methods="GET")
      * @param EventRepository $eventRepository
-     * @return JsonResponse
+     * @return Response
      */
-    public function events(EventRepository $eventRepository): JsonResponse
+    public function events(EventRepository $eventRepository): Response
     {
-        return new JsonResponse($eventRepository->findAll());
+        $events = $eventRepository->findAll();
+        $serializer = $this->container->get('serializer');
+        $events = $serializer->serialize($events, 'json');
+
+        $response = new Response();
+        $response->setContent($events);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }
 
     /**
      * @Route("/post", name="api_post", methods="GET")
      * @param PostRepository $postRepository
-     * @return JsonResponse
+     * @return Response
      */
-    public function posts(PostRepository $postRepository): JsonResponse
+    public function post(PostRepository $postRepository): Response
     {
-        return new JsonResponse($postRepository->findAll());
+        $posts = $postRepository->findAll();
+        $serializer = $this->container->get('serializer');
+        $posts = $serializer->serialize($posts, 'json');
+        
+        $response = new Response();
+        $response->setContent($posts);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }
 
     /**
-     * @Route("/phone", name="api_post", methods="POST")
+     * @Route("/phone", name="api_phone", methods="POST")
      *
      * @param Request $request
      * @param EntityManagerInterface $em
