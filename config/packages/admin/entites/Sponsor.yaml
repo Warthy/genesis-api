@@ -1,0 +1,26 @@
+easy_admin:
+    entities:
+        Sponsor:
+            class: App\Entity\Sponsor
+            image_base_path: '/assets'
+            menu:
+                label: 'Sponsors'
+                icon: 'handshake-o'
+            list:
+                fields:
+                    - { property: 'name', label: 'Nom' }
+                    - { property: 'description', label: 'Description' }
+                    - { property: 'reduction', label: 'Code Réduction' }
+                    - { property: 'media', label: 'Image', type: 'image' }
+            show:
+                fields:
+                    - 'name'
+                    - 'description'
+                    - 'reduction'
+                    - { property: 'media', type: 'image' }
+            form:
+                fields:
+                    - 'name'
+                    - 'reduction'
+                    - { property: 'description', type: 'textarea' }
+                    - { property: 'uploadedFile', label: 'Image', type: 'file' }

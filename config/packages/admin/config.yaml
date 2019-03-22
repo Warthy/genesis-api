@@ -4,6 +4,7 @@ easy_admin:
         menu:
             - { entity: 'Post', label: 'Publications', icon: 'newspaper-o'}
             - { entity: 'Event', label: 'Evenements', icon: 'calendar'}
+            - { entity: 'Sponsor', label: 'Sponsors', icon: 'handshake-o'}
             - { entity: 'Notification', label: 'Notifications', icon: 'bell'}
         assets:
             favicon: '/assets/favicon.png'

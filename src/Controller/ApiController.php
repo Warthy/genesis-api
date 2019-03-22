@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Phone;
 use App\Repository\EventRepository;
 use App\Repository\PostRepository;
+use App\Repository\SponsorRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -46,12 +47,30 @@ class ApiController extends AbstractController
         $posts = $postRepository->findAll();
         $serializer = $this->container->get('serializer');
         $posts = $serializer->serialize($posts, 'json');
-        
+
         $response = new Response();
         $response->setContent($posts);
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
+
+    /**
+     * @Route("/sponsor", name="api_sponsor", methods="GET")
+     * @param SponsorRepository $sponsorRepository
+     * @return Response
+     */
+    public function sponsor(SponsorRepository $sponsorRepository): Response
+    {
+        $sponsors = $sponsorRepository->findAll();
+        $serializer = $this->container->get('serializer');
+        $sponsors = $serializer->serialize($sponsors, 'json');
+
+        $response = new Response();
+        $response->setContent($sponsors);
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+    }
+
 
     /**
      * @Route("/phone", name="api_phone", methods="POST")

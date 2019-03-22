@@ -14,7 +14,7 @@ easy_admin:
                     - { property: 'date', type: 'date' }
                     - { property: 'startsAt', label: 'Début', type: 'time' }
                     - { property: 'EndsAt', label: 'Fin', type: 'time' }
-                    - { property: 'media.path', label: 'Image', type: 'image' }
+                    - { property: 'media', label: 'Image', type: 'image' }
                 sort: ['date', 'ASC']
             search:
                 sort: ['date', 'ASC']
@@ -25,7 +25,7 @@ easy_admin:
                     - 'Date'
                     - 'StartsAt'
                     - 'EndsAt'
-                    - { property: 'media.path', type: 'image' }
+                    - { property: 'media', type: 'image' }
             form:
                 fields:
                     - 'title'
