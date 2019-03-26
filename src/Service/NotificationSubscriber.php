@@ -73,8 +73,14 @@ class NotificationSubscriber implements EventSubscriberInterface
                     $res = $res['body']['data'];
                     $notification->setSuccess(true);
                     break;
+                default:
+                    $res = $res['body'];
+                    $notification->setSuccess(false);
+                    break;
             }
         }
+        $notification->setSuccess(false);
+        $notification->setResponse(["error" => "Aucun destinaire en base de données"]);
     }
 
     private function prepareCurl($data){
