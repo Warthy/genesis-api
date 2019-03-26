@@ -52,6 +52,11 @@ class Notification
      */
     private $sendAt;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $success;
+
     public function __construct()
     {
         $this->sendAt = new DateTime('now');
@@ -142,6 +147,18 @@ class Notification
     public function setSendAt(\DateTimeInterface $sendAt): self
     {
         $this->sendAt = $sendAt;
+
+        return $this;
+    }
+
+    public function isSuccess(): ?bool
+    {
+        return $this->success;
+    }
+
+    public function setSuccess(?bool $success): self
+    {
+        $this->success = $success;
 
         return $this;
     }

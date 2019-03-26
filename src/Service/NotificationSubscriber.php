@@ -5,18 +5,20 @@ namespace App\Service;
 use App\Entity\Notification;
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use ExponentPhpSDK\Exceptions\ExpoException;
-use ExponentPhpSDK\Expo;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
 class NotificationSubscriber implements EventSubscriberInterface
 {
+    const EXPO_API_URL = 'https://exp.host/--/api/v2/push/send';
+
     /** @var EntityManagerInterface */
     private $em;
 
     /** @var PhoneRepository */
     private $phoneRepository;
+
+    private $ch;
 
     public function __construct(EntityManagerInterface $em, PhoneRepository $phoneRepository)
     {
@@ -37,34 +39,62 @@ class NotificationSubscriber implements EventSubscriberInterface
         if (!($entity instanceof Notification)) {
             return;
         }
-        $expo = Expo::normalSetup();
 
         $notification = $entity;
 
         $targets = $this->phoneRepository->findAll();
-        $ids = [];
+        $postData = [];
 
-        if($notification->getRandom()) $targets = [array_rand($targets)];
-        foreach ($targets as $target)
-        {
-            $expo->subscribe($target->getToken(), $target->getToken());
-            $ids[] = $target->getId();
+        if ($targets) {
+            if ($notification->getRandom()) $targets = [$targets[array_rand($targets)]];
+
+            $notificationRequest = [
+                'title' => $notification->getTitle(),
+                'body' => $notification->getBody() ??  '',
+                'subtitle' => $notification->getSubtitle() ?? '',
+                'ttl' => 10,
+                'priority' => $notification->getPriority() ?? 'default',
+                'sound' => 'default',
+            ];
+
+            foreach ($targets as $target) {
+                $postData[] = $notificationRequest + ['to' => $target->getToken()];
+            }
+
+            $this->prepareCurl($postData);
+            $res = $this->executeCurl();
+
+            switch ($res['status_code']){
+                case 400:
+                    $res = $res['body']['errors'];
+                    $notification->setSuccess(false);
+                break;
+                case 200:
+                    $res = $res['body']['data'];
+                    $notification->setSuccess(true);
+                    break;
+            }
         }
+    }
 
-        $notificationRequest = [
-            'title' => $notification->getTitle(),
-            'body' => $notification->getBody(),
-            'subtitle' => $notification->getSubtitle(),
-            'ttl' => 10,
-            'priority' => $notification->getPriority() ?? 'default',
-            'sound' => 'default',
+    private function prepareCurl($data){
+        $this->ch = curl_init();
+
+        curl_setopt($this->ch, CURLOPT_URL, self::EXPO_API_URL);
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, [
+            'accept: application/json',
+            'content-type: application/json',
+        ]);
+        curl_setopt($this->ch, CURLOPT_POST, 1);
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($data));
+    }
+
+    private function executeCurl(){
+        $response = [
+            'body' => curl_exec($this->ch),
+            'status_code' => curl_getinfo($this->ch, CURLINFO_HTTP_CODE)
         ];
-
-        try {
-            $response = $expo->notify($ids, $notificationRequest);
-            $notification->setResponse(json_decode($response));
-        } catch (ExpoException $e) {
-
-        }
+        return $response;
     }
 }
