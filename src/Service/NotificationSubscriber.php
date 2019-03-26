@@ -70,7 +70,7 @@ class NotificationSubscriber implements EventSubscriberInterface
                     $notification->setSuccess(false);
                 break;
                 case 200:
-                    $notification->setResponse($res['body']['data']);
+                    $notification->setResponse($res['body']);
                     $notification->setSuccess(true);
                     break;
                 default:
@@ -78,9 +78,12 @@ class NotificationSubscriber implements EventSubscriberInterface
                     $notification->setSuccess(false);
                     break;
             }
+            return;
         }
+        
         $notification->setSuccess(false);
         $notification->setResponse(["error" => "Aucun destinaire en base de données"]);
+        return;
     }
 
     private function prepareCurl($data){

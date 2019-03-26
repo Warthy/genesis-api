@@ -9,6 +9,7 @@ easy_admin:
                     - { property: 'title', label: 'Titre' }
                     - 'body'
                     - { property: 'random', label: 'Notification aléatoire', type: 'boolean'}
+                    - { property: 'success', label: 'Envoie réusie', type: 'boolean'}
             form:
                 fields:
                     - { property: 'title', label: 'Titre', type: 'text'}
