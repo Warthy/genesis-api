@@ -66,15 +66,15 @@ class NotificationSubscriber implements EventSubscriberInterface
 
             switch ($res['status_code']){
                 case 400:
-                    $res = $res['body']['errors'];
+                    $notification->setResponse($res['body']['errors']);
                     $notification->setSuccess(false);
                 break;
                 case 200:
-                    $res = $res['body']['data'];
+                    $notification->setResponse($res['body']['data']);
                     $notification->setSuccess(true);
                     break;
                 default:
-                    $res = $res['body'];
+                    $notification->setResponse($res['body']);
                     $notification->setSuccess(false);
                     break;
             }
