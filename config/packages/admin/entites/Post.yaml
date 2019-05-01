@@ -9,6 +9,7 @@ easy_admin:
                 fields:
                     - { property: 'title', label: 'Titre' }
                     - { property: 'content', label: 'Contenu' }
+                    - { property: 'link', label: 'Lien' }
                     - { property: 'publicationDate', label: 'Date de publication', type: 'date' }
                 sort: 'publicationDate'
             search:
@@ -17,4 +18,5 @@ easy_admin:
                 fields:
                     - { property: 'title', label: 'Titre', type: 'text'}
                     - { property: 'content', label: 'Contenu',type: 'textarea' }
+                    - { property: 'link', label: 'Lien', type: 'text' }
                     - { property: 'uploadedFiles', label: 'Images', type: 'file', type_options: { multiple: 'true' } }
