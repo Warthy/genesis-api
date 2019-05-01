@@ -18,7 +18,7 @@ class NotificationSubscriber implements EventSubscriberInterface
     /** @var PhoneRepository */
     private $phoneRepository;
 
-    private $ch;
+    private $mh;
 
     public function __construct(EntityManagerInterface $em, PhoneRepository $phoneRepository)
     {
@@ -36,74 +36,96 @@ class NotificationSubscriber implements EventSubscriberInterface
     public function send(GenericEvent $event)
     {
         $entity = $event->getSubject();
+        $res = [];
         if (!($entity instanceof Notification)) {
             return;
         }
 
         $notification = $entity;
+        $notificationRequest = [
+            'title' => $notification->getTitle(),
+            'body' => $notification->getBody() ?? '',
+            'subtitle' => $notification->getSubtitle() ?? '',
+            'ttl' => 10,
+            'priority' => $notification->getPriority() ?? 'default',
+            'sound' => 'default',
+        ];
 
         $targets = $this->phoneRepository->findAll();
-        $postData = [];
-
         if ($targets) {
-            if ($notification->getRandom()) $targets = [$targets[array_rand($targets)]];
+            $chs = [];
+            if ($notification->getRandom()) {
+                do {
+                    $this->mh = curl_multi_init();
+                    $ch = curl_init();
+                    $target = $targets[array_rand($targets)];
+                    $postData[] = $notificationRequest + ['to' => $target->getToken()];
 
-            $notificationRequest = [
-                'title' => $notification->getTitle(),
-                'body' => $notification->getBody() ??  '',
-                'subtitle' => $notification->getSubtitle() ?? '',
-                'ttl' => 10,
-                'priority' => $notification->getPriority() ?? 'default',
-                'sound' => 'default',
-            ];
+                    $this->prepareCurl($ch, $postData);
 
-            foreach ($targets as $target) {
-                $postData[] = $notificationRequest + ['to' => $target->getToken()];
+                    $this->executeCurl([$ch]);
+                    $res = json_decode(curl_multi_getcontent($ch));
+                } while ($res->data[0]->status == 'error');
+
+                $notification->setSuccess(true);
+                $notification->setResponse($res);
+                return;
+            }else {
+                $this->mh = curl_multi_init();
+                foreach ($targets as $target){
+                    $postData = [];
+                    $postData[] = $notificationRequest + ['to' => $target->getToken()];
+                    $ch = curl_init();
+                    $this->prepareCurl($ch , $postData);
+
+                    $chs[] = $ch;
+                }
+                $this->executeCurl($chs);
+                $res = [];
+                foreach ($chs as $ch){
+                    $res[] = json_decode(curl_multi_getcontent($ch));
+                }
+                $notification->setSuccess(true);
+                $notification->setResponse($res);
+                return;
             }
-
-            $this->prepareCurl($postData);
-            $res = $this->executeCurl();
-
-            switch ($res['status_code']){
-                case 400:
-                    $notification->setResponse($res['body']['errors']);
-                    $notification->setSuccess(false);
-                break;
-                case 200:
-                    $notification->setResponse($res['body']);
-                    $notification->setSuccess(true);
-                    break;
-                default:
-                    $notification->setResponse($res['body']);
-                    $notification->setSuccess(false);
-                    break;
-            }
-            return;
         }
-        
+
+
         $notification->setSuccess(false);
         $notification->setResponse(["error" => "Aucun destinaire en base de données"]);
+
         return;
     }
 
-    private function prepareCurl($data){
-        $this->ch = curl_init();
-
-        curl_setopt($this->ch, CURLOPT_URL, self::EXPO_API_URL);
-        curl_setopt($this->ch, CURLOPT_HTTPHEADER, [
+    private function prepareCurl($ch, $data)
+    {
+        curl_setopt($ch, CURLOPT_URL, self::EXPO_API_URL);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'accept: application/json',
             'content-type: application/json',
         ]);
-        curl_setopt($this->ch, CURLOPT_POST, 1);
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_multi_add_handle($this->mh, $ch);
     }
 
-    private function executeCurl(){
-        $response = [
-            'body' => curl_exec($this->ch),
-            'status_code' => curl_getinfo($this->ch, CURLINFO_HTTP_CODE)
-        ];
-        return $response;
+    private function executeCurl(array $chs)
+    {
+        //LAUNCH cURL
+        do {
+            $status = curl_multi_exec($this->mh, $active);
+            if ($active) {
+                curl_multi_select($this->mh);
+            }
+        } while ($active && $status == CURLM_OK);
+
+        //CLOSE ALL cURL
+        foreach ($chs as $ch) {
+            curl_multi_remove_handle($this->mh, $ch);
+        }
+        curl_multi_close($this->mh);
+        return;
     }
 }
