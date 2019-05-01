@@ -51,7 +51,7 @@ class Sponsor
 
     /**
      * @ORM\Column(type="datetime")
-     * @var \DateTime
+     * @var DateTime
      */
     private $updatedAt;
 
@@ -60,15 +60,16 @@ class Sponsor
      */
     public function upload(){
         $this->updatedAt = new DateTime('now');
-        $media = new Media();
+        if($this->uploadedFile){
+            $media = new Media();
 
-        $path = sha1(uniqid(mt_rand(), true)).'.'.$this->uploadedFile->guessExtension();
-        $this->uploadedFile->move(Media::ASSETS_PATH.self::MEDIA_ROOT_DIR, $path);
+            $path = sha1(uniqid(mt_rand(), true)).'.'.$this->uploadedFile->guessExtension();
+            $this->uploadedFile->move(Media::ASSETS_PATH.self::MEDIA_ROOT_DIR, $path);
 
-        $media->setPath(self::MEDIA_ROOT_DIR.$path);
-        $this->setMedia($media);
-
-        unset($uploadedFile);
+            $media->setPath(self::MEDIA_ROOT_DIR.$path);
+            $this->setMedia($media);
+            unset($this->uploadedFile);
+        }
     }
 
     /**
@@ -121,7 +122,7 @@ class Sponsor
 
     public function getMedia(): ?string
     {
-        return $this->media->getPath();
+        return $this->media ? $this->media->getPath(): '';
     }
 
     public function setMedia(?Media $media): self

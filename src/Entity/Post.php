@@ -50,25 +50,32 @@ class Post
 
     /**
      * @ORM\Column(type="datetime")
-     * @var \DateTime
+     * @var DateTime
      */
     private $updatedAt;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $link;
 
     /**
      * @ORM\PreFlush()
      */
     public function upload()
     {
-        $this->updatedAt = new \DateTime('now');
-        foreach ($this->uploadedFiles as $uploadedFile) {
-            $media = new Media();
+        $this->updatedAt = new DateTime('now');
+        if(sizeof($this->uploadedFiles)){
+            foreach ($this->uploadedFiles as $uploadedFile) {
+                $media = new Media();
 
-            $path = sha1(uniqid(mt_rand(), true)) . '.' . $uploadedFile->guessExtension();
-            $uploadedFile->move(Media::ASSETS_PATH . self::MEDIA_ROOT_DIR, $path);
+                $path = sha1(uniqid(mt_rand(), true)) . '.' . $uploadedFile->guessExtension();
+                $uploadedFile->move(Media::ASSETS_PATH . self::MEDIA_ROOT_DIR, $path);
 
-            $media->setPath(self::MEDIA_ROOT_DIR . $path);
-            $this->addMedia($media);
-            unset($uploadedFile);
+                $media->setPath(self::MEDIA_ROOT_DIR . $path);
+                $this->addMedia($media);
+                unset($this->uploadedFile);
+            }
         }
     }
 
@@ -148,6 +155,18 @@ class Post
                 $media->setPost(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLink(): ?string
+    {
+        return $this->link;
+    }
+
+    public function setLink(?string $link): self
+    {
+        $this->link = $link;
 
         return $this;
     }
